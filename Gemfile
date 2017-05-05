@@ -1,16 +1,17 @@
 source 'https://rubygems.org'
 
-ruby '2.0.0'
+ruby '2.3.1'
 
 gem 'puma'
-gem 'rack-coffee'
+
+group :development do
+  gem 'pry'
+end
 
 group :web do
+  gem 'dotenv'
+  gem 'httparty'
   gem 'haml'
   gem 'sinatra'
   gem 'sass'
-end
-
-group :development do
-  gem 'sinatra-reloader'
 end

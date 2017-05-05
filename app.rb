@@ -1,14 +1,19 @@
 Bundler.require :web
 Bundler.require :development if development?
 
-get '/style.css' do
-  scss :style
-end
+Dotenv.load
 
-get '/' do
-  haml :index
-end
+post '/webhooks/circleci/receive' do
+  request.body.rewind
 
-not_found do
-  haml :'404'
+  circlePayload = JSON.parse request.body.read
+  buildStatus = circlePayload['payload']['status']
+
+  if buildStatus == 'success'
+    HTTParty.post("https://maker.ifttt.com/trigger/build_passing/with/key/#{ENV['IFTTT_KEY']}")
+  elsif buildStatus == 'failed'
+    HTTParty.post("https://maker.ifttt.com/trigger/build_failing/with/key/#{ENV['IFTTT_KEY']}")
+  end
+
+  200
 end
