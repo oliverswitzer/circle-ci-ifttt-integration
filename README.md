@@ -1,4 +1,4 @@
-# Middleware that sits between your circle CI build and IFTTT
+# A deployable middleware API that allows you to notify IFTTT when your Circle CI build fails
 
 Specify in your circle.yml:
 
