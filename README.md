@@ -1,32 +1,55 @@
-# Sinatra Starter
-## Simple project template for a Sinatra application
+# Middleware that sits between your circle CI build and IFTTT
 
-### Sinatra Starter uses a few common components:
+Specify in your circle.yml:
 
-- [Haml](http://haml.info/) (markup)
-- [Sass](http://sass-lang.com/) (styling)
-- [Coffeescript]() (javascript)
-- [Bundler](http://bundler.io/) (package management)
-- [Heroku Toolbelt](https://toolbelt.heroku.com/) (which gets you...)
-  - [Heroku client](https://www.heroku.com/) (CLI tool for creating and managing Heroku apps)
-  - [Foreman](https://github.com/ddollar/foreman) (An easy option for running your apps locally)
-  - [Git](https://github.com) (revision control and pushing to Heroku)
+```.yml
+...
+notify:
+  webhooks:
+    - url: https://<DEPLOYED_APP_URL>/webhooks/circleci/receive
+...
+```
 
-### Installation
+Circle will send a a `POST` request to `/webhooks/circleci/receive` with a JSON body of:
 
-Clone this directory and change into it. Run `bundle` to install all dependencies.
+```
+{
+  "payload": {
+    ...
+    "status": "<CIRCLE CI BUILD STATUS>"
+    ...
+  }
+}
 
-### Running locally
+```
 
-Since Sinatra Starter is configured to deploy on Heroku, a `Procfile` is included.
+The app will translate the following statuses from Circle CI to IFTTT maker webhook events:
 
-    web: bundle exec ruby app.rb -p $PORT
+|**Circle CI**|     **IFTTT**    |
+|-------------|------------------|
+| `success`   | `build_passing`  |
+| `failed`    | `build_failing`  |
 
-Use `foreman start -p XXXX` on your port of choice. For example:
+## Development
 
-    foreman start -p 3000
+**Install dependencies**:
+
+`bundle install`
+
+**Start the app:**
+
+`bundle exec ruby app.rb -p 3000`
+
+**Create `.env` file, and add it to .gitignore**:
+
+```
+IFTTT_KEY=<YOUR KEY>
+```
+
+## Deploying
+
+Simply run `git push heroku master`
+
+Ensure that you've set `IFTTT_KEY` as an environment variable on Heroku.
 
 
-### Deploying
-
-Configure an app for free on Heroku and follow their instructions on [deploying with Git](https://devcenter.heroku.com/articles/git).
